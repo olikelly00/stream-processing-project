@@ -9,7 +9,7 @@ def oauth_cb(oauth_config):
     return auth_token, expiry_ms/1000
 
 consumer = Consumer({
-    "debug": "all",
+    #"debug": "all",
     'bootstrap.servers': "b-2.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9098",
     'client.id': socket.gethostname(),
     'security.protocol': 'SASL_SSL',
