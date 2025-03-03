@@ -11,18 +11,22 @@ def oauth_cb(oauth_config):
     # Note that this library expects oauth_cb to return expiry time in seconds since epoch, while the token generator returns expiry in ms
     return auth_token, expiry_ms/1000
 
-consumer = Consumer({
-    # "debug": "all",
-    'bootstrap.servers': 'b-2.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9098',
-    'client.id': socket.gethostname(),
-    'security.protocol': 'SASL_SSL',
-    'sasl.mechanisms': 'OAUTHBEARER',
-    'oauth_cb': oauth_cb,
-    'group.id': 'event-group-id',
-    'auto.offset.reset': 'earliest'
-})
+# consumer = Consumer({
+#     # "debug": "all",
+#     'bootstrap.servers': 'b-2.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9098',
+#     'client.id': socket.gethostname(),
+#     'security.protocol': 'SASL_SSL',
+#     'sasl.mechanisms': 'OAUTHBEARER',
+#     'oauth_cb': oauth_cb,
+#     'group.id': 'event-group-id',
+#     'auto.offset.reset': 'earliest'
+# })
 
-consumer.subscribe(['events'])
+# consumer.subscribe(['events'])
+
+spark = SparkSession.builder \
+    .appName("KafkaEventAnonymizer") \
+    .getOrCreate()
 
 # try:
 #     while True:
@@ -54,9 +58,7 @@ kafka_options = {
     "subscribe": "events"
 }
 
-spark = SparkSession.builder \
-    .appName("KafkaEventAnonymizer") \
-    .getOrCreate()
+
 
 
 df = spark.readStream.format("kafka").options(**kafka_options).load()
@@ -84,7 +86,7 @@ data_frame = df.withColumn(
 )
 
 print("redacting df")
-data_frame = data_frame.withcolumn("order_email", expr("******"))
+data_frame = data_frame.withColumn("order_email", expr("******"))
 print("df redacted")
 
 print("writing query")
