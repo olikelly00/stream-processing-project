@@ -82,12 +82,15 @@ data_frame = df.withColumn(
     col("parsed_value.order_email").alias("order_email")
 )
 
+print("redacting df")
 data_frame = data_frame.withcolumn("order_email", expr("******"))
+print("df redacted")
 
-
+print("writing query")
 query = data_frame.writeStream \
     .format("console") \
     .option("checkpointLocation", "/tmp/kafka-checkpoint-raw") \
     .start()
+print("query written")
 
 
