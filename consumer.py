@@ -22,7 +22,7 @@ consumer = Consumer({
     'auto.offset.reset': 'earliest'
 })
 
-# consumer.subscribe(['events'])
+consumer.subscribe(['events'])
 
 # try:
 #     while True:
@@ -37,9 +37,6 @@ consumer = Consumer({
         # # Print raw message content for debugging
         # raw_message = msg.value().decode('utf-8')
         # print(f"Raw message: {raw_message}")
-
-
-
 
 
 
