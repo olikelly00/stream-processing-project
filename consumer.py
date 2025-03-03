@@ -45,13 +45,13 @@ consumer.subscribe(['events'])
 #     print(f"Error decoding JSON: {e}")
 
 kafka_options = {
-    "kafka.bootstrap.servers": "b-2-public.edithcluster.c85ver.c3.kafka.eu-west-2.amazonaws.com:9198",
+    "kafka.bootstrap.servers": "b-2-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198",
     "kafka.sasl.mechanism": "AWS_MSK_IAM",
     "kafka.security.protocol": "SASL_SSL",
     "kafka.sasl.jaas.config": """software.amazon.msk.auth.iam.IAMLoginModule required awsProfileName="";""",
     "kafka.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
     "startingOffsets": "latest",
-    "subscribe": "transactions"
+    "subscribe": "events"
 }
 
 spark = SparkSession.builder \
