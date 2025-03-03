@@ -3,7 +3,6 @@ from aws_msk_iam_sasl_signer import MSKAuthTokenProvider
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType
 from pyspark.sql.functions import col, from_json, expr
-
 import socket
 import json
 
@@ -23,25 +22,30 @@ consumer = Consumer({
     'auto.offset.reset': 'earliest'
 })
 
-consumer.subscribe(['events'])
+# consumer.subscribe(['events'])
 
+# try:
+#     while True:
+        # msg = consumer.poll(1.0)  # Poll for messages (1 second timeout)
 
-try:
-    while True:
-        msg = consumer.poll(1.0)  # Poll for messages (1 second timeout)
-
-        if msg is None:
-            continue  # No new messages, keep polling
+        # if msg is None:
+        #     continue  # No new messages, keep polling
         
-        if msg.error():
-            raise KafkaException(msg.error())
+        # if msg.error():
+        #     raise KafkaException(msg.error())
 
-        # Print raw message content for debugging
-        raw_message = msg.value().decode('utf-8')
-        print(f"Raw message: {raw_message}")
+        # # Print raw message content for debugging
+        # raw_message = msg.value().decode('utf-8')
+        # print(f"Raw message: {raw_message}")
 
-except json.JSONDecodeError as e:
-    print(f"Error decoding JSON: {e}")
+
+
+
+
+
+
+# except json.JSONDecodeError as e:
+#     print(f"Error decoding JSON: {e}")
 
 kafka_options = {
     "kafka.bootstrap.servers": "b-2-public.edithcluster.c85ver.c3.kafka.eu-west-2.amazonaws.com:9198",
