@@ -80,7 +80,7 @@ print("HEY2")
 def detect_fraud(value):
     print(value)
 
-    add_to_cart_tracker["user_id"] == 1
+    add_to_cart_tracker["user_id"] = 1
     print(add_to_cart_tracker)
 
 
