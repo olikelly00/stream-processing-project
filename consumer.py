@@ -61,7 +61,7 @@ kafka_options = {
 
 
 kafka_options_processed_events = {
-    "kafka.bootstrap.servers": "b-2-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198",
+    "kafka.bootstrap.servers": "b-1-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198",
     "kafka.sasl.mechanism": "AWS_MSK_IAM",
     "kafka.security.protocol": "SASL_SSL",
     "kafka.sasl.jaas.config": """software.amazon.msk.auth.iam.IAMLoginModule required awsProfileName="";""",
