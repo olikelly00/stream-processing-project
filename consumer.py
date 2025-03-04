@@ -87,7 +87,7 @@ data_frame = df.withColumn(
 )
 
 print("redacting df")
-data_frame = data_frame.withColumn("order_email", expr("''"))
+data_frame = data_frame.withColumn("order_email", "*****")
 print("df redacted")
 
 print("writing query")
