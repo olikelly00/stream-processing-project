@@ -175,11 +175,20 @@ def detect_fraud(batch_df, batch_id):
     """Detects fraudulent 'add_to_cart' activity in each batch."""
     global add_to_cart_tracker
     current_time = time.time()
+    user_id_temp = ""
+    aux = 0
 
     for row in batch_df.collect():
         user_id = row["user_id"]
         event_name = row["event_name"]
         item_url = row["item_url"]
+
+        if aux == 0:
+            aux +=1
+            user_id_temp = user_id
+        
+        if user_id_temp == user_id:
+            print("existent user")
 
         if event_name == "add_to_cart" and user_id and item_url:
             # Ensure the user's entry exists
