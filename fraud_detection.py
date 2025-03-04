@@ -75,6 +75,7 @@ cleanup_thread = threading.Thread(target=reset_dict, daemon=True)
 cleanup_thread.start()
 
 def detect_fraud(event):
+    print("Hello fraudster!!!")
     if event["event_name"] == "add_to_cart":
         print("Add to cart event detected")
         if event["user_id"] not in add_to_cart_tracker.keys():
