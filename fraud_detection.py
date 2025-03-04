@@ -77,7 +77,7 @@ print("HEY")
 
 print("HEY2")
 
-def detect_fraud(value):
+async def detect_fraud(value):
     print(value)
 
     add_to_cart_tracker["user_id"] = 1
