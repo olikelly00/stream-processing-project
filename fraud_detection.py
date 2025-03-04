@@ -196,7 +196,7 @@ def detect_fraud(batch_df, batch_id):
             }
 
             # Check if user added 5 different items in the last 5 seconds
-            if len(add_to_cart_tracker[user_id]) >= 5:
+            if len(add_to_cart_tracker[user_id]) >= 2:
                 send_fraud_alert(user_id)
 
 # Apply fraud detection using foreachBatch()
