@@ -97,4 +97,5 @@ query = data_frame.writeStream \
     .start()
 print("query written")
 
+query.awaitTermination()
 
