@@ -72,11 +72,9 @@ add_to_cart_tracker = {}
 def reset_dict(dict):
     while True:
         time.sleep(5)
-        print("FUCTION IS RUNNING")
         dict.clear()
 
 print("HEY")
-cleanup_thread = threading.Thread(target=reset_dict(add_to_cart_tracker), daemon=True)
 
 print("HEY2")
 
@@ -110,6 +108,7 @@ def detect_fraud(value):
 
 
 detect_fraud(df['value'])
+cleanup_thread = threading.Thread(target=reset_dict(add_to_cart_tracker), daemon=True)
 cleanup_thread.start()
 
 
