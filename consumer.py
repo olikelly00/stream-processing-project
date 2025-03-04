@@ -60,6 +60,15 @@ kafka_options = {
 }
 
 
+kafka_options_processed_events = {
+    "kafka.bootstrap.servers": "b-2-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198",
+    "kafka.sasl.mechanism": "AWS_MSK_IAM",
+    "kafka.security.protocol": "SASL_SSL",
+    "kafka.sasl.jaas.config": """software.amazon.msk.auth.iam.IAMLoginModule required awsProfileName="";""",
+    "kafka.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
+    "startingOffsets": "latest"
+}
+
 
 
 df = spark.readStream.format("kafka").options(**kafka_options).load()
@@ -95,10 +104,7 @@ df = data_frame.selectExpr("to_json(struct(*)) AS value")
 print("writing query")
 query = df.writeStream \
     .format("kafka") \
-    .option("kafka.bootstrap.servers", "b-1-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198") \
-    .option("kafka.security.protocol", "SASL_SSL") \
-    .option("kafka.sasl.mechanism", "AWS_MSK_IAM") \
-    .option("kafka.sasl.jaas.config", """software.amazon.msk.auth.iam.IAMLoginModule required awsProfileName="";""") \
+    .option(**kafka_options_processed_events) \
     .option("topic", "processed-events") \
     .option("checkpointLocation", "/tmp/kafka-checkpoints") \
     .start()
