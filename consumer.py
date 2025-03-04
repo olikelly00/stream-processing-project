@@ -25,7 +25,8 @@ def oauth_cb(oauth_config):
 # consumer.subscribe(['events'])
 
 spark = SparkSession.builder \
-    .appName("KafkaEventAnonymizer") \
+    .appName("EventAnonymiser") \
+    .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0") \
     .getOrCreate()
 
 # try:
