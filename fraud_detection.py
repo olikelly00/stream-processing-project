@@ -81,6 +81,7 @@ print("HEY2")
 def detect_fraud(value):
     print(value)
     value_dict = json.loads(str(value)[0])
+    print(value_dict)
     user_id = value_dict.get('user_id')
     event_name = value_dict.get('event_name')
     print("Hello fraudster!!!")
