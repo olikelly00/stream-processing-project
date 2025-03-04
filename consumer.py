@@ -104,7 +104,7 @@ df = data_frame.selectExpr("to_json(struct(*)) AS value")
 print("writing query")
 query = df.writeStream \
     .format("kafka") \
-    .option(**kafka_options_processed_events) \
+    .options(**kafka_options_processed_events) \
     .option("topic", "processed-events") \
     .option("checkpointLocation", "/tmp/kafka-checkpoints") \
     .start()
