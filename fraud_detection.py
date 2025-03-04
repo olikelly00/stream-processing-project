@@ -74,6 +74,7 @@ def reset_dict(dict):
         time.sleep(5)
         dict.clear()
 
+print("HEY")
 cleanup_thread = threading.Thread(target=reset_dict(add_to_cart_tracker), daemon=True)
 cleanup_thread.start()
 
