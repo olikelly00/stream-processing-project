@@ -91,7 +91,7 @@ def detect_fraud(event):
             #reset_dict(add_to_cart_tracker)
 
 
-detect_fraud(data_frame)
+detect_fraud(df)
 
 
 
