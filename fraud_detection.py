@@ -76,10 +76,13 @@ cleanup_thread.start()
 
 def detect_fraud(event):
     if event["event_name"] == "add_to_cart":
+        print("Add to cart event detected")
         if event["user_id"] not in add_to_cart_tracker.keys():
             add_to_cart_tracker[event["user_id"]] = [time.now()]
+            print(add_to_cart_tracker)
         else:
             add_to_cart_tracker[event["user_id"]].append(time.now())
+            print("I got here ----- in the else")
                 #[timestamp for timestamp in add_to_cart_tracker[event["user_id"]] if timestamp >= (current_time - 5)]
 
         if len(add_to_cart_tracker[event["user_id"]]) >= 5:
