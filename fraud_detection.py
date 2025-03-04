@@ -98,13 +98,16 @@ def detect_fraud(value):
 
         if len(add_to_cart_tracker[user_id]) >= 5:
             print("THIS IS A FRAUD")
+            return True
             # DO A FRAUD MESSAGE
             
-        # return False
+        return False
+    
 
-# detect_fraud_spark_udf = udf(detect_fraud, BooleanType())
 
-# df = df.withColumn("is_fraud", detect_fraud_spark_udf(col("value")))
+detect_fraud_spark_udf = udf(detect_fraud, BooleanType())
+
+df = df.withColumn("is_fraud", detect_fraud_spark_udf(col("value")))
 
 
 
