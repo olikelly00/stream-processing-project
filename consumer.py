@@ -2,7 +2,7 @@ from confluent_kafka import Consumer, KafkaException
 from aws_msk_iam_sasl_signer import MSKAuthTokenProvider
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType
-from pyspark.sql.functions import col, from_json, expr
+from pyspark.sql.functions import col, from_json, expr, lit
 import socket
 import json
 
@@ -87,7 +87,7 @@ data_frame = df.withColumn(
 )
 
 print("redacting df")
-data_frame = data_frame.withColumn("order_email", "*****")
+data_frame = data_frame.withColumn("order_email", lit("[Redacted]"))
 print("df redacted")
 
 print("writing query")
