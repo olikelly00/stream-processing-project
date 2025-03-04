@@ -82,7 +82,8 @@ def detect_fraud(value):
 
     add_to_cart_tracker["user_id"] = 1
     print(add_to_cart_tracker)
-
+    reset_dict(add_to_cart_tracker)
+    print(add_to_cart_tracker)
 
 
     value_dict = json.loads(str(value))
