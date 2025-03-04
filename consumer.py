@@ -90,8 +90,11 @@ print("redacting df")
 data_frame = data_frame.withColumn("order_email", lit("[Redacted]"))
 print("df redacted")
 
+df = data_frame.selectExpr("to_json(struct(*)) AS value")
+
+
 print("writing query")
-query = data_frame.writeStream \
+query = df.writeStream \
     .format("kafka") \
     .option("kafka.bootstrap.servers", "b-2-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198") \
     .option("topic", "processed-events") \
