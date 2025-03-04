@@ -6,6 +6,7 @@ from pyspark.sql.functions import udf
 import json
 import time
 import threading
+import socket
 from confluent_kafka import Producer
 
 def oauth_cb(oauth_config):
@@ -155,7 +156,11 @@ add_to_cart_tracker = {}
 
 # Kafka producer setup for publishing fraud alerts
 producer_config = {
-    'bootstrap.servers': "b-2-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198"
+    'bootstrap.servers': "b-2-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198",
+    'client.id': socket.gethostname(),
+    'security.protocol': 'SASL_SSL',
+    'sasl.mechanisms': 'OAUTHBEARER',
+    'oauth_cb': oauth_cb,
 }
 producer = Producer(producer_config)
 
