@@ -92,10 +92,14 @@ print("df redacted")
 
 print("writing query")
 query = data_frame.writeStream \
-    .format("console") \
+    .format("kafka") \
+    .option("kafka.bootstrap.servers", "b-2-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198") \
+    .option("topic", "processed-events") \
     .option("checkpointLocation", "/tmp/kafka-checkpoint-raw") \
     .start()
 print("query written")
+
+
 
 query.awaitTermination()
 
