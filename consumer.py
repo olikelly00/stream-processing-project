@@ -26,7 +26,7 @@ def oauth_cb(oauth_config):
 
 spark = SparkSession.builder \
     .appName("EventAnonymiser") \
-    .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0") \
+    .config('spark.jars.packages', 'org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,software.amazon.msk:aws-msk-iam-auth:2.2.0') \
     .getOrCreate()
 
 # try:
