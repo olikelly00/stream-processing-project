@@ -120,11 +120,13 @@ async def detect_fraud(value):
 #df = df.withColumn("is_fraud", detect_fraud_spark_udf(col("value")))
 
 
-
-asyncio.run(detect_fraud(df['value']))
+try:
+    asyncio.run(detect_fraud(df['value']))
+except Exception as e: 
+    print(e)
 #detect_fraud(df['value'])
-cleanup_thread = threading.Thread(target=reset_dict, args=(add_to_cart_tracker,), daemon=True)
-cleanup_thread.start()
+# cleanup_thread = threading.Thread(target=reset_dict, args=(add_to_cart_tracker,), daemon=True)
+# cleanup_thread.start()
 
 
 
