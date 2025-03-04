@@ -74,7 +74,7 @@ def reset_dict(dict):
         time.sleep(5)
         dict.clear()
 
-cleanup_thread = threading.Thread(target=reset_dict, daemon=True)
+cleanup_thread = threading.Thread(target=reset_dict(add_to_cart_tracker), daemon=True)
 cleanup_thread.start()
 
 def detect_fraud(value):
