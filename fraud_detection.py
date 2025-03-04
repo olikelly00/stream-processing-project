@@ -111,9 +111,9 @@ async def detect_fraud(value):
     
 
 
-detect_fraud_spark_udf = udf(detect_fraud, BooleanType())
+#detect_fraud_spark_udf = udf(detect_fraud, BooleanType())
 
-df = df.withColumn("is_fraud", detect_fraud_spark_udf(col("value")))
+#df = df.withColumn("is_fraud", detect_fraud_spark_udf(col("value")))
 
 
 
