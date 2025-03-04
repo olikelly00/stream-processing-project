@@ -84,30 +84,33 @@ async def detect_fraud(value):
     print(add_to_cart_tracker)
     reset_dict(add_to_cart_tracker)
     print(add_to_cart_tracker)
+    await asyncio.sleep(6)
+    print(add_to_cart_tracker)
 
+    # value_dict = json.loads(str(value))
+    # print(value_dict)
+    # user_id = value_dict.get('user_id')
+    # event_name = value_dict.get('event_name')
+    # print("Hello fraudster!!!")
 
-    value_dict = json.loads(str(value))
-    print(value_dict)
-    user_id = value_dict.get('user_id')
-    event_name = value_dict.get('event_name')
-    print("Hello fraudster!!!")
-    if event_name == "add_to_cart":
-        print("Add to cart event detected")
-        current_time = time.time()
-        if user_id not in add_to_cart_tracker:
-            add_to_cart_tracker[user_id] = [current_time]
-            print(add_to_cart_tracker)
-        else:
-            add_to_cart_tracker[user_id].append(current_time)
-            print("I got here ----- in the else")
-                #[timestamp for timestamp in add_to_cart_tracker[event["user_id"]] if timestamp >= (current_time - 5)]
+    # reset_dict(add_to_cart_tracker)
+    # if event_name == "add_to_cart":
+    #     print("Add to cart event detected")
+    #     current_time = time.time()
+    #     if user_id not in add_to_cart_tracker:
+    #         add_to_cart_tracker[user_id] = [current_time]
+    #         print(add_to_cart_tracker)
+    #     else:
+    #         add_to_cart_tracker[user_id].append(current_time)
+    #         print("I got here ----- in the else")
+    #             #[timestamp for timestamp in add_to_cart_tracker[event["user_id"]] if timestamp >= (current_time - 5)]
 
-        if len(add_to_cart_tracker[user_id]) >= 5:
-            print("THIS IS A FRAUD")
-            return True
-            # DO A FRAUD MESSAGE
+    #     if len(add_to_cart_tracker[user_id]) >= 5:
+    #         print("THIS IS A FRAUD")
+    #         return True
+    #         # DO A FRAUD MESSAGE
             
-        return False
+    #     return False
     
 
 
