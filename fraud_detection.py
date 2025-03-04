@@ -78,7 +78,7 @@ cleanup_thread = threading.Thread(target=reset_dict, daemon=True)
 cleanup_thread.start()
 
 def detect_fraud(value):
-    value_dict = json.loads(value)
+    value_dict = json.loads(str(value))
     user_id = value_dict.get('user_id')
     event_name = value_dict.get('event_name')
     print("Hello fraudster!!!")
