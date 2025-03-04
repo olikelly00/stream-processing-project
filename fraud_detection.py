@@ -80,7 +80,7 @@ print("HEY2")
 
 def detect_fraud(value):
     print(value)
-    value_dict = json.loads(str(value)[0])
+    value_dict = json.loads(str(value))
     print(value_dict)
     user_id = value_dict.get('user_id')
     event_name = value_dict.get('event_name')
@@ -110,12 +110,12 @@ detect_fraud_spark_udf = udf(detect_fraud, BooleanType())
 df = df.withColumn("is_fraud", detect_fraud_spark_udf(col("value")))
 
 
+df.show()
+
 
 detect_fraud(df['value'])
-cleanup_thread = threading.Thread(target=reset_dict(add_to_cart_tracker), daemon=True)
+cleanup_thread = threading.Thread(target=reset_dict, args=(add_to_cart_tracker,), daemon=True)
 cleanup_thread.start()
-
-
 
 
 
