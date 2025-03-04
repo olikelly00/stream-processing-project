@@ -1,7 +1,10 @@
 from aws_msk_iam_sasl_signer import MSKAuthTokenProvider
 from pyspark.sql import SparkSession
-from pyspark.sql.types import StructType, StructField, StringType
+from pyspark.sql.types import StructType, StructField, StringType, BooleanType
 from pyspark.sql.functions import col, from_json, expr, lit
+from pyspark.sql.functions import udf
+import json
+
 import time
 import threading
 
@@ -69,26 +72,37 @@ add_to_cart_tracker = {}
 def reset_dict(dict):
     while True:
         time.sleep(5)
-        dict = {}
+        dict.clear()
 
 cleanup_thread = threading.Thread(target=reset_dict, daemon=True)
 cleanup_thread.start()
 
 def detect_fraud(value):
+    value_dict = json.loads(value)
+    user_id = value_dict.get('user_id')
+    event_name = value_dict.get('event_name')
     print("Hello fraudster!!!")
-    if value["event_name"] == "add_to_cart":
+    if event_name == "add_to_cart":
         print("Add to cart event detected")
-        if value["user_id"] not in add_to_cart_tracker.keys():
-            add_to_cart_tracker[value["user_id"]] = [time.now()]
+        current_time = time.time()
+        if user_id not in add_to_cart_tracker:
+            add_to_cart_tracker[user_id] = [current_time]
             print(add_to_cart_tracker)
         else:
-            add_to_cart_tracker[value["user_id"]].append(time.now())
+            add_to_cart_tracker[user_id].append(current_time)
             print("I got here ----- in the else")
                 #[timestamp for timestamp in add_to_cart_tracker[event["user_id"]] if timestamp >= (current_time - 5)]
 
-        if len(add_to_cart_tracker[value["user_id"]]) >= 5:
-            print("Fraud")
-            #reset_dict(add_to_cart_tracker)
+        if len(add_to_cart_tracker[user_id]) >= 5:
+            print("THIS IS A FRAUD")
+            # DO A FRAUD MESSAGE
+            
+        # return False
+
+# detect_fraud_spark_udf = udf(detect_fraud, BooleanType())
+
+# df = df.withColumn("is_fraud", detect_fraud_spark_udf(col("value")))
+
 
 
 detect_fraud(df["value"])
