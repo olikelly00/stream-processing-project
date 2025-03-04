@@ -96,7 +96,7 @@ df = data_frame.selectExpr("to_json(struct(*)) AS value")
 print("writing query")
 query = df.writeStream \
     .format("kafka") \
-    .option("kafka.bootstrap.servers", "b-2-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198") \
+    .option("kafka.bootstrap.servers", "b-1.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9098") \
     .option("topic", "processed-events") \
     .option("checkpointLocation", "/tmp/kafka-checkpoint-raw") \
     .start()
