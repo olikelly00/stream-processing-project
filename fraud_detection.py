@@ -73,10 +73,6 @@ async def reset_dict(dict):
     await asyncio.sleep(5)
     dict.clear()
 
-print("HEY")
-
-print("HEY2")
-
 async def detect_fraud(value):
     print(value)
 
@@ -115,17 +111,23 @@ async def detect_fraud(value):
     
 
 
-#detect_fraud_spark_udf = udf(detect_fraud, BooleanType())
+detect_fraud_spark_udf = udf(detect_fraud, BooleanType())
 
-#df = df.withColumn("is_fraud", detect_fraud_spark_udf(col("value")))
+df_with_fraud = df.withColumn("is_fraud", detect_fraud_spark_udf(col("value")))
 
+query = df_with_fraud.writeStream \
+    .outputMode("append") \
+    .format("console") \
+    .start()
 
-try:
-    print(df['value'])
-    asyncio.run(detect_fraud(df['value']))
+query.awaitTermination()
 
-except Exception as e: 
-    print(e)
+# try:
+#     print(df['value'])
+#     asyncio.run(detect_fraud(df['value']))
+
+# except Exception as e: 
+#     print(e)
 #detect_fraud(df['value'])
 # cleanup_thread = threading.Thread(target=reset_dict, args=(add_to_cart_tracker,), daemon=True)
 # cleanup_thread.start()
