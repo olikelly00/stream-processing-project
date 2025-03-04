@@ -4,9 +4,9 @@ from pyspark.sql.types import StructType, StructField, StringType, BooleanType
 from pyspark.sql.functions import col, from_json, expr, lit
 from pyspark.sql.functions import udf
 import json
-import asyncio
 import time
 import threading
+from confluent_kafka import Producer
 
 def oauth_cb(oauth_config):
     auth_token, expiry_ms = MSKAuthTokenProvider.generate_auth_token("eu-west-2")
@@ -34,93 +34,93 @@ df = spark.readStream.format("kafka").options(**kafka_options).load()
 df = df.withColumn('decoded_value', col('value').cast('string'))
 
 
-schema = StructType([
-    StructField("user_id", StringType(), True),
-    StructField("event_name" , StringType(), True),
-    StructField("page" , StringType(), True),
-    StructField("item_url" , StringType(), True),
-    StructField("order_email" , StringType(), True),
-])
+# schema = StructType([
+#     StructField("user_id", StringType(), True),
+#     StructField("event_name" , StringType(), True),
+#     StructField("page" , StringType(), True),
+#     StructField("item_url" , StringType(), True),
+#     StructField("order_email" , StringType(), True),
+# ])
 
 
-data_frame = df.withColumn(
-    'parsed_value',
-    from_json(col('decoded_value'), schema)
-).select(
-    col("parsed_value.user_id").alias("user_id"),
-    col("parsed_value.event_name").alias("event_name"),
-    col("parsed_value.page").alias("page"),
-    col("parsed_value.item_url").alias("item_url"),
-    col("parsed_value.order_email").alias("order_email")
-)
+# data_frame = df.withColumn(
+#     'parsed_value',
+#     from_json(col('decoded_value'), schema)
+# ).select(
+#     col("parsed_value.user_id").alias("user_id"),
+#     col("parsed_value.event_name").alias("event_name"),
+#     col("parsed_value.page").alias("page"),
+#     col("parsed_value.item_url").alias("item_url"),
+#     col("parsed_value.order_email").alias("order_email")
+# )
 
-df = data_frame.selectExpr("to_json(struct(*)) AS value")
-
-
-# query = df.writeStream \
-#     .format("console") \
-#     .options(**kafka_options) \
-#     .option("checkpointLocation", "/tmp/kafka-checkpoints") \
-#     .start()
+# df = data_frame.selectExpr("to_json(struct(*)) AS value")
 
 
-# query.awaitTermination()
+# # query = df.writeStream \
+# #     .format("console") \
+# #     .options(**kafka_options) \
+# #     .option("checkpointLocation", "/tmp/kafka-checkpoints") \
+# #     .start()
 
 
-add_to_cart_tracker = {}
+# # query.awaitTermination()
 
-async def reset_dict(dict):
-    await asyncio.sleep(5)
-    dict.clear()
 
-async def detect_fraud(value):
-    print(value)
+# add_to_cart_tracker = {}
 
-    #add_to_cart_tracker["user_id"] = 1
-    #print(add_to_cart_tracker)
-    #asyncio.create_task(reset_dict(add_to_cart_tracker))
-    #await reset_dict(add_to_cart_tracker)
-    #print(add_to_cart_tracker)
-    #await asyncio.sleep(6)
-    #print(add_to_cart_tracker)
+# async def reset_dict(dict):
+#     await asyncio.sleep(5)
+#     dict.clear()
 
-    value_dict = json.loads(str(value))
-    print(value_dict)
-    user_id = value_dict.get('user_id')
-    event_name = value_dict.get('event_name')
-    print("Hello fraudster!!!")
+# async def detect_fraud(value):
+#     print(value)
 
-    asyncio.create_task(reset_dict(add_to_cart_tracker))
-    if event_name == "add_to_cart":
-        print("Add to cart event detected")
-        current_time = time.time()
-        if user_id not in add_to_cart_tracker:
-            add_to_cart_tracker[user_id] = [current_time]
-            print(add_to_cart_tracker)
-        else:
-            add_to_cart_tracker[user_id].append(current_time)
-            print("I got here ----- in the else")
-                #[timestamp for timestamp in add_to_cart_tracker[event["user_id"]] if timestamp >= (current_time - 5)]
+#     #add_to_cart_tracker["user_id"] = 1
+#     #print(add_to_cart_tracker)
+#     #asyncio.create_task(reset_dict(add_to_cart_tracker))
+#     #await reset_dict(add_to_cart_tracker)
+#     #print(add_to_cart_tracker)
+#     #await asyncio.sleep(6)
+#     #print(add_to_cart_tracker)
 
-        if len(add_to_cart_tracker[user_id]) >= 5:
-            print("THIS IS A FRAUD")
-            return True
-            # DO A FRAUD MESSAGE
+#     value_dict = json.loads(str(value))
+#     print(value_dict)
+#     user_id = value_dict.get('user_id')
+#     event_name = value_dict.get('event_name')
+#     print("Hello fraudster!!!")
+
+#     asyncio.create_task(reset_dict(add_to_cart_tracker))
+#     if event_name == "add_to_cart":
+#         print("Add to cart event detected")
+#         current_time = time.time()
+#         if user_id not in add_to_cart_tracker:
+#             add_to_cart_tracker[user_id] = [current_time]
+#             print(add_to_cart_tracker)
+#         else:
+#             add_to_cart_tracker[user_id].append(current_time)
+#             print("I got here ----- in the else")
+#                 #[timestamp for timestamp in add_to_cart_tracker[event["user_id"]] if timestamp >= (current_time - 5)]
+
+#         if len(add_to_cart_tracker[user_id]) >= 5:
+#             print("THIS IS A FRAUD")
+#             return True
+#             # DO A FRAUD MESSAGE
             
-        return False
+#         return False
     
 
 
-detect_fraud_spark_udf = udf(detect_fraud, BooleanType())
+# detect_fraud_spark_udf = udf(detect_fraud, BooleanType())
 
-df_with_fraud = df.withColumn("is_fraud", detect_fraud_spark_udf(col("value")))
+# df_with_fraud = df.withColumn("is_fraud", detect_fraud_spark_udf(col("value")))
 
-query = df_with_fraud.writeStream \
-    .outputMode("append") \
-    .format("console") \
-    .start()
+# query = df_with_fraud.writeStream \
+#     .outputMode("append") \
+#     .format("console") \
+#     .start()
 
-query.awaitTermination()
+# query.awaitTermination()
 
 # try:
 #     print(df['value'])
@@ -134,3 +134,85 @@ query.awaitTermination()
 
 
 
+schema = StructType([
+    StructField("user_id", StringType(), True),
+    StructField("event_name", StringType(), True),
+    StructField("item_url", StringType(), True),
+])
+
+# Parse JSON
+data_frame = df.withColumn(
+    'parsed_value',
+    from_json(col('decoded_value'), schema)
+).select(
+    col("parsed_value.user_id").alias("user_id"),
+    col("parsed_value.event_name").alias("event_name"),
+    col("parsed_value.item_url").alias("item_url")
+)
+
+
+add_to_cart_tracker = {}
+
+# Kafka producer setup for publishing fraud alerts
+producer_config = {
+    'bootstrap.servers': "b-2-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198"
+}
+producer = Producer(producer_config)
+
+def send_fraud_alert(user_id):
+    """Publishes a fraud alert message to Kafka topic 'fraud-detection'."""
+    message = json.dumps({"user_id": user_id, "alert": "potential fraud detected"})
+    producer.produce("fraud-detection", value=message.encode("utf-8"))
+    producer.flush()
+    print(f"🚨 Fraud Alert Sent for user {user_id} 🚨")
+
+def detect_fraud(value: str) -> bool:
+    """Detects fraudulent 'add_to_cart' activity synchronously."""
+    if not value or value.strip() == "":
+        return False  # Ignore empty messages
+
+    try:
+        value_dict = json.loads(value)
+    except json.JSONDecodeError:
+        return False  # Ignore invalid JSON
+
+    user_id = value_dict.get('user_id')
+    event_name = value_dict.get('event_name')
+    item_url = value_dict.get('item_url')
+
+    if event_name == "add_to_cart" and user_id and item_url:
+        current_time = time.time()
+
+        # Ensure the user's entry exists
+        if user_id not in add_to_cart_tracker:
+            add_to_cart_tracker[user_id] = {}
+
+        # Store item with timestamp
+        add_to_cart_tracker[user_id][item_url] = current_time
+
+        # Remove old items (older than 5 seconds)
+        add_to_cart_tracker[user_id] = {
+            item: timestamp for item, timestamp in add_to_cart_tracker[user_id].items()
+            if timestamp >= current_time - 5
+        }
+
+        # Check if user added 5 different items in the last 5 seconds
+        if len(add_to_cart_tracker[user_id]) >= 5:
+            send_fraud_alert(user_id)
+            return True
+
+    return False
+
+# Register UDF
+detect_fraud_udf = udf(detect_fraud, BooleanType())
+
+# Apply fraud detection to the stream
+df_with_fraud = data_frame.withColumn("is_fraud", detect_fraud_udf(col("decoded_value")))
+
+# Write the stream with fraud detection
+query = df_with_fraud.writeStream \
+    .outputMode("append") \
+    .format("console") \
+    .start()
+
+query.awaitTermination()
