@@ -192,7 +192,7 @@ def detect_fraud(batch_df, batch_id):
             # Remove old items (older than 5 seconds)
             add_to_cart_tracker[user_id] = {
                 item: timestamp for item, timestamp in add_to_cart_tracker[user_id].items()
-                if timestamp >= current_time - 5
+                if timestamp >= current_time - 15
             }
 
             # Check if user added 5 different items in the last 5 seconds
