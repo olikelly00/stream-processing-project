@@ -82,7 +82,7 @@ async def detect_fraud(value):
 
     add_to_cart_tracker["user_id"] = 1
     print(add_to_cart_tracker)
-    asyncio.run(reset_dict(add_to_cart_tracker))
+    asyncio.create_task(reset_dict(add_to_cart_tracker))
     print(add_to_cart_tracker)
     await asyncio.sleep(6)
     print(add_to_cart_tracker)
