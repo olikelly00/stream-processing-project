@@ -1,10 +1,9 @@
-from confluent_kafka import Consumer, KafkaException
 from aws_msk_iam_sasl_signer import MSKAuthTokenProvider
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType
 from pyspark.sql.functions import col, from_json, expr, lit
-import socket
-import json
+import time
+import threading
 
 def oauth_cb(oauth_config):
     auth_token, expiry_ms = MSKAuthTokenProvider.generate_auth_token("eu-west-2")
@@ -63,3 +62,35 @@ query = df.writeStream \
 
 
 query.awaitTermination()
+
+
+add_to_cart_tracker = {}
+
+def reset_dict(dict):
+    while True:
+        time.sleep(5)
+        dict = {}
+
+cleanup_thread = threading.Thread(target=reset_dict, daemon=True)
+cleanup_thread.start()
+
+def detect_fraud(event):
+    if event["event_name"] == "add_to_cart":
+        if event["user_id"] not in add_to_cart_tracker.keys():
+            add_to_cart_tracker[event["user_id"]] = [time.now()]
+        else:
+            add_to_cart_tracker[event["user_id"]].append(time.now())
+                #[timestamp for timestamp in add_to_cart_tracker[event["user_id"]] if timestamp >= (current_time - 5)]
+
+        if len(add_to_cart_tracker[event["user_id"]]) >= 5:
+            print("Fraud")
+            #reset_dict(add_to_cart_tracker)
+
+
+detect_fraud(data_frame)
+
+
+
+
+
+
