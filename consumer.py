@@ -69,8 +69,6 @@ kafka_options_processed_events = {
     "startingOffsets": "latest"
 }
 
-
-
 df = spark.readStream.format("kafka").options(**kafka_options).load()
 df = df.withColumn('decoded_value', col('value').cast('string'))
 
