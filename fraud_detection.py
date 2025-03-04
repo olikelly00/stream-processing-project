@@ -110,7 +110,6 @@ detect_fraud_spark_udf = udf(detect_fraud, BooleanType())
 df = df.withColumn("is_fraud", detect_fraud_spark_udf(col("value")))
 
 
-df.show()
 
 
 detect_fraud(df['value'])
