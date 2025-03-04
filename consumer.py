@@ -98,7 +98,7 @@ query = df.writeStream \
     .option("kafka.bootstrap.servers", "b-1-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198") \
     .option("kafka.security.protocol", "SASL_SSL") \
     .option("kafka.sasl.mechanism", "AWS_MSK_IAM") \
-    .option("kafka.sasl.jaas.config", "software.amazon.msk.auth.iam.IAMLoginModule required;") \
+    .option("kafka.sasl.jaas.config", """software.amazon.msk.auth.iam.IAMLoginModule required awsProfileName="";""") \
     .option("topic", "processed-events") \
     .option("checkpointLocation", "/tmp/kafka-checkpoints") \
     .start()
