@@ -72,6 +72,7 @@ add_to_cart_tracker = {}
 def reset_dict(dict):
     while True:
         time.sleep(5)
+        print("FUCTION IS RUNNING")
         dict.clear()
 
 print("HEY")
