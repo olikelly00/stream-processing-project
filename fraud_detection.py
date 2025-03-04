@@ -117,8 +117,8 @@ async def detect_fraud(value):
 
 
 
-
-detect_fraud(df['value'])
+asyncio.run(detect_fraud(df['value']))
+#detect_fraud(df['value'])
 cleanup_thread = threading.Thread(target=reset_dict, args=(add_to_cart_tracker,), daemon=True)
 cleanup_thread.start()
 
