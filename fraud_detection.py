@@ -4,7 +4,7 @@ from pyspark.sql.types import StructType, StructField, StringType, BooleanType
 from pyspark.sql.functions import col, from_json, expr, lit
 from pyspark.sql.functions import udf
 import json
-
+import asyncio
 import time
 import threading
 
@@ -69,10 +69,9 @@ df = data_frame.selectExpr("to_json(struct(*)) AS value")
 
 add_to_cart_tracker = {}
 
-def reset_dict(dict):
-    while True:
-        time.sleep(5)
-        dict.clear()
+async def reset_dict(dict):
+    await asyncio.sleep(5)
+    dict.clear()
 
 print("HEY")
 
@@ -80,6 +79,12 @@ print("HEY2")
 
 def detect_fraud(value):
     print(value)
+
+    add_to_cart_tracker["user_id"] == 1
+    print(add_to_cart_tracker)
+
+
+
     value_dict = json.loads(str(value))
     print(value_dict)
     user_id = value_dict.get('user_id')
