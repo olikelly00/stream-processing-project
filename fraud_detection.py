@@ -166,53 +166,37 @@ def send_fraud_alert(user_id):
     producer.flush()
     print(f"🚨 Fraud Alert Sent for user {user_id} 🚨")
 
-def detect_fraud(value: str) -> bool:
-    """Detects fraudulent 'add_to_cart' activity synchronously."""
-    if not value or value.strip() == "":
-        return False  # Ignore empty messages
+def detect_fraud(batch_df, batch_id):
+    """Detects fraudulent 'add_to_cart' activity in each batch."""
+    global add_to_cart_tracker
+    current_time = time.time()
 
-    try:
-        value_dict = json.loads(value)
-    except json.JSONDecodeError:
-        return False  # Ignore invalid JSON
+    for row in batch_df.collect():
+        user_id = row["user_id"]
+        event_name = row["event_name"]
+        item_url = row["item_url"]
 
-    user_id = value_dict.get('user_id')
-    event_name = value_dict.get('event_name')
-    item_url = value_dict.get('item_url')
+        if event_name == "add_to_cart" and user_id and item_url:
+            # Ensure the user's entry exists
+            if user_id not in add_to_cart_tracker:
+                add_to_cart_tracker[user_id] = {}
 
-    if event_name == "add_to_cart" and user_id and item_url:
-        current_time = time.time()
+            # Store item with timestamp
+            add_to_cart_tracker[user_id][item_url] = current_time
 
-        # Ensure the user's entry exists
-        if user_id not in add_to_cart_tracker:
-            add_to_cart_tracker[user_id] = {}
+            # Remove old items (older than 5 seconds)
+            add_to_cart_tracker[user_id] = {
+                item: timestamp for item, timestamp in add_to_cart_tracker[user_id].items()
+                if timestamp >= current_time - 5
+            }
 
-        # Store item with timestamp
-        add_to_cart_tracker[user_id][item_url] = current_time
+            # Check if user added 5 different items in the last 5 seconds
+            if len(add_to_cart_tracker[user_id]) >= 5:
+                send_fraud_alert(user_id)
 
-        # Remove old items (older than 5 seconds)
-        add_to_cart_tracker[user_id] = {
-            item: timestamp for item, timestamp in add_to_cart_tracker[user_id].items()
-            if timestamp >= current_time - 5
-        }
-
-        # Check if user added 5 different items in the last 5 seconds
-        if len(add_to_cart_tracker[user_id]) >= 5:
-            send_fraud_alert(user_id)
-            return True
-
-    return False
-
-# Register UDF
-detect_fraud_udf = udf(detect_fraud, BooleanType())
-
-# Apply fraud detection to the stream
-df_with_fraud = data_frame.withColumn("is_fraud", detect_fraud_udf(col("decoded_value")))
-
-# Write the stream with fraud detection
-query = df_with_fraud.writeStream \
-    .outputMode("append") \
-    .format("console") \
+# Apply fraud detection using foreachBatch()
+query = data_frame.writeStream \
+    .foreachBatch(detect_fraud) \
     .start()
 
 query.awaitTermination()
