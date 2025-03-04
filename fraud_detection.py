@@ -57,14 +57,14 @@ data_frame = df.withColumn(
 df = data_frame.selectExpr("to_json(struct(*)) AS value")
 
 
-# query = df.writeStream \
-#     .format("console") \
-#     .options(**kafka_options) \
-#     .option("checkpointLocation", "/tmp/kafka-checkpoints") \
-#     .start()
+query = df.writeStream \
+    .format("console") \
+    .options(**kafka_options) \
+    .option("checkpointLocation", "/tmp/kafka-checkpoints") \
+    .start()
 
 
-# query.awaitTermination()
+query.awaitTermination()
 
 
 add_to_cart_tracker = {}
