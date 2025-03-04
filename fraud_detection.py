@@ -105,7 +105,7 @@ def detect_fraud(value):
 
 
 
-detect_fraud(df["value"])
+detect_fraud(df)
 
 
 
