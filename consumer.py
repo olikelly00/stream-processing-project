@@ -88,7 +88,7 @@ columns = ["id", "birthdate", "country_code", "web_user_agent"]
 user_df = spark.createDataFrame(rows, columns)
 
 
-master_df = user_df.join(data_frame, user_df.user_id == data_frame.user_id).select('user_df.*')
+master_df = user_df.join(data_frame, user_df.id == data_frame.user_id).select('user_df.*')
 
 df = master_df.selectExpr("to_json(struct(*)) AS value")
 
