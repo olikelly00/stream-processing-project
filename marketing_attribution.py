@@ -67,7 +67,7 @@ data_frame = df.withColumn(
 
 user_tracker = {}
 
-def track_marketing_channel(batch_df, batch_id):
+def track_marketing_channel(batch_df):
     for row in batch_df.collect():
         user_id = row["user_id"]
         event_name = row["event_name"]
@@ -81,7 +81,7 @@ def track_marketing_channel(batch_df, batch_id):
     return channel
 
             
-track_marketing_channel()
+track_marketing_channel(data_frame)
         
 
 # for every event
