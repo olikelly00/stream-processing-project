@@ -192,6 +192,32 @@ def reset_tracker():
 # Start the reset loop
 reset_tracker()
 
+def simulate_test_events():
+    """Simulates multiple 'add_to_cart' events for a single user to test fraud detection."""
+    test_user_id = "test-user-123"
+    test_items = ["item1", "item2", "item3", "item4", "item5"]
+
+    for i, item in enumerate(test_items):
+        time.sleep(1)  # Add one item per second (modify for faster/slower tests)
+        current_time = time.time()
+
+        # Manually update tracker
+        if test_user_id not in add_to_cart_tracker:
+            add_to_cart_tracker[test_user_id] = {}
+
+        add_to_cart_tracker[test_user_id][item] = current_time
+
+        # Check if fraud should be triggered
+        if len(add_to_cart_tracker[test_user_id]) >= 5:
+            send_fraud_alert(test_user_id)
+
+        print(f"🛒 Simulated: {test_user_id} added {item} at {current_time}")
+        print(f"📌 Current Tracker: {add_to_cart_tracker}")
+
+# Run the simulation in a separate thread to not block the Spark streaming job
+threading.Thread(target=simulate_test_events, daemon=True).start()
+
+
 def detect_fraud(batch_df, batch_id):
     """Detects fraudulent 'add_to_cart' activity in each batch."""
     global add_to_cart_tracker
