@@ -67,7 +67,9 @@ def store_attribution(user_id, order_id, channel):
 
     cursor = conn.cursor()
 
-    create_table = "CREATE TABLE IF NOT EXISTS purchase_marketing_attributions;"
+    create_table = """
+    CREATE TABLE IF NOT EXISTS purchase_marketing_attributions;
+    """
 
     insert_query = """
     INSERT INTO purchase_marketing_attributions (user_id, order_id, marketing_channel)
