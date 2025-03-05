@@ -3,6 +3,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, BooleanType
 from pyspark.sql.functions import col, from_json, expr, lit
 from pyspark.sql.functions import udf
+import psycopg2
 import json
 import time
 import threading
@@ -34,6 +35,7 @@ df = df.withColumn('decoded_value', col('value').cast('string'))
 
 schema = StructType([
     StructField("user_id", StringType(), True),
+    StructField("order_id", StringType(), True),
     StructField("event_name", StringType(), True),
     StructField("channel", StringType(), True)
 ])
@@ -44,32 +46,17 @@ data_frame = df.withColumn(
     from_json(col('decoded_value'), schema)
 ).select(
     col("parsed_value.user_id").alias("user_id"),
+    col("parsed_value.order_id").alias("order_id")
     col("parsed_value.event_name").alias("event_name"),
     col("parsed_value.channel").alias("channel")
 )
-
-# query = df.writeStream \
-#     .format("console") \
-#     .options(**kafka_options) \
-#     .option("checkpointLocation", "/tmp/kafka-checkpoints") \
-#     .start()
-
-# query.awaitTermination()
-
-
-# if not, continue
-# if so, search event stream fo first instance of user_id
-# check instance for marketing channel
-# if no marketing channel
-# save record with markeitng channel as user ID, order ID, 'organic'
-# if marketing channel
-# save record with markeitng channel as user ID, order ID, marketing_channel_name
 
 user_tracker = {}
 
 def track_marketing_channel(batch_df, batch_id):
     for row in batch_df.collect():
         user_id = row["user_id"]
+        order_id = row["order_id"]
         event_name = row["event_name"]
         channel = row["channel"]
         if event_name == 'visit':
@@ -81,8 +68,7 @@ def track_marketing_channel(batch_df, batch_id):
                 print(user_tracker)
         elif event_name == 'order_confirmed':
             channel = user_tracker.get(user_id)
-        print("New user tracked!", row)
-        return channel
+        store_attribution(user_id, order_id, channel)
 
 
 query = data_frame.writeStream \
@@ -90,42 +76,33 @@ query = data_frame.writeStream \
     .start()
 
 query.awaitTermination()
-# for every event
-# if event_name = 'visit'
-# if user_id not in user_tracker
-# add user_id, channel if exists to tracker else organic
-
-# elif event_name = 'order_confirmed'
-# take user_id
-# search user_tracker for user id
-# return user_id['channel']
 
 
+def store_attribution(user_id, order_id, channel):
+    """
+    Stores the marketing attribution data into the PostgreSQL database.
+    """
+    conn = psycopg2.connect(
+        dbname="green-analytics-db",
+        user="postgres",
+        password="i_am_a_password",
+        host="green-analytics-db.cfmnnswnfhpn.eu-west-2.rds.amazonaws.com",
+        port="5432"
+    )
+
+    cursor = conn.cursor()
+
+    insert_query = """
+    INSERT INTO purchase_marketing_attributions (user_id, order_id, marketing_channel)
+    VALUES (%s, %s, %s)
+    """
+    cursor.execute(insert_query, (user_id, order_id, channel))
+    conn.commit()
+    cursor.close()
+    conn.close()
 
 
+# conn = psycopg2.connect( dbname="analytics_db", user="admin", password="password123", host="your-database-host", port="5432" ) 
 
-
-
-
-
-        # if event_name == "order_confirmed":
-        #     target_user = row["user_id"]
-        #     # if so, search event stream fo first instance of user_id
-        #     first_instance_user_event = batch_df[]
-
-        #     if user_id not in add_to_cart_tracker:
-        #         add_to_cart_tracker[user_id] = {}
-
-        #     # Store item with timestamp
-        #     add_to_cart_tracker[user_id][item_url] = current_time
-        #     print(add_to_cart_tracker)
-        #     # Remove old items (older than 5 seconds)
-        #     add_to_cart_tracker[user_id] = {
-        #         item: timestamp for item, timestamp in add_to_cart_tracker[user_id].items()
-        #         if timestamp >= current_time - 5
-        #     }
-
-        #     # Check if user added 5 different items in the last 5 seconds
-        #     if len(add_to_cart_tracker[user_id]) >= 2:
-        #         send_fraud_alert(user_id)
+# cursor = conn.cursor()
 
