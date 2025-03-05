@@ -77,7 +77,6 @@ def track_marketing_channel(batch_df, batch_id):
                 user_tracker[user_id] = channel if channel else 'organic'
         elif event_name == 'order_confirmed':
             channel = user_tracker.get(user_id)
-    print("CHANNEL:", channel)
     return channel
 
        
