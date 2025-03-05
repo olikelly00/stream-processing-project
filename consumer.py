@@ -80,13 +80,13 @@ conn = psycopg2.connect(
 cursor = conn.cursor()
 
 select_user_data = """
-SELECT user_id, birthdate, country_code, web_user_agent FROM users;
+SELECT id, birthdate, country_code, web_user_agent FROM users;
 """
 
 
 # cursor.execute(select_user_data)
 
-user_df = spark.sql(cursor.execute("SELECT user_id, birthdate, country_code, web_user_agent FROM users;"))
+user_df = spark.sql(cursor.execute("SELECT id, birthdate, country_code, web_user_agent FROM users;"))
 
 
 
