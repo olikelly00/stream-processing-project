@@ -64,6 +64,8 @@ query = data_frame.writeStream \
     .outputMode("append") \
     .start()
 
+query.awaitTermination()
+
 batch_df = spark.read.parquet("/tmp/stream_output/")
 
 
