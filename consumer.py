@@ -65,25 +65,20 @@ data_frame = df.withColumn(
     col("parsed_value.channel").alias("channel")
 )
 
-data_frame.select("user_id","event_name","page", "item_url", "order_email", "channel").write.format("jdbc")\
-    .option("url", "jdbc:postgresql://green-analytics-db.cfmnnswnfhpn.eu-west-2.rds.amazonaws.com:5432/green_analytics") \
-    .option("driver", "org.postgresql.Driver").option("dbtable", "events") \
-    .option("user", "postgres").option("password", "i_am_a_password").save()
 
-print("redacting df")
+
 data_frame = data_frame.withColumn("order_email", lit("[Redacted]"))
-print("df redacted")
 
 df = data_frame.selectExpr("to_json(struct(*)) AS value")
 
-print("writing query")
+
 query = df.writeStream \
     .format("kafka") \
     .options(**kafka_options_processed_events) \
     .option("topic", "processed-events") \
     .option("checkpointLocation", "/tmp/kafka-checkpoints") \
     .start()
-print("query written")
+
 
 
 query.awaitTermination()
