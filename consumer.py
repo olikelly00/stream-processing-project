@@ -1,10 +1,11 @@
 from confluent_kafka import Consumer, KafkaException
 from aws_msk_iam_sasl_signer import MSKAuthTokenProvider
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession, SQLContext
 from pyspark.sql.types import StructType, StructField, StringType
 from pyspark.sql.functions import col, from_json, expr, lit
 import socket
 import json
+import psycopg2
 
 def oauth_cb(oauth_config):
     auth_token, expiry_ms = MSKAuthTokenProvider.generate_auth_token("eu-west-2")
@@ -65,11 +66,38 @@ data_frame = df.withColumn(
     col("parsed_value.channel").alias("channel")
 )
 
+conn = psycopg2.connect(
+        dbname="postgres",
+        user="postgres",
+        password="=abO1aUrF!hHX#:5",
+        host="sp-application-users-database.cfmnnswnfhpn.eu-west-2.rds.amazonaws.com",
+        port="5432"
+    )
+
+
+
+
+cursor = conn.cursor()
+
+select_user_data = """
+SELECT user_id, birthdate, country_code, web_user_agent FROM users;
+"""
+
+
+
+
+
+# cursor.execute(select_user_data)
+
+user_df = SQLContext.sql(select_user_data)
+
 
 
 data_frame = data_frame.withColumn("order_email", lit("[Redacted]"))
 
-df = data_frame.selectExpr("to_json(struct(*)) AS value")
+master_df = user_df.join(data_frame, user_df.user_id == data_frame.user_id).select('user_df.*')
+
+df = master_df.selectExpr("to_json(struct(*)) AS value")
 
 
 query = df.writeStream \
