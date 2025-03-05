@@ -67,10 +67,13 @@ def store_attribution(user_id, order_id, channel):
 
     cursor = conn.cursor()
 
+    create_table = "CREATE TABLE IF NOT EXISTS purchase_marketing_attributions"
+
     insert_query = """
     INSERT INTO purchase_marketing_attributions (user_id, order_id, marketing_channel)
     VALUES (%s, %s, %s)
     """
+    cursor.execute(create_table)
     cursor.execute(insert_query, (user_id, order_id, channel))
     conn.commit()
     cursor.close()
