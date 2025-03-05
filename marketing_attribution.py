@@ -15,7 +15,7 @@ def oauth_cb(oauth_config):
     return auth_token, expiry_ms/1000
 
 spark = SparkSession.builder \
-    .appName("FraudDetection") \
+    .appName("MarketAttribution") \
     .config('spark.jars.packages', 'org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,software.amazon.msk:aws-msk-iam-auth:2.2.0') \
     .getOrCreate()
 
@@ -92,14 +92,16 @@ def track_marketing_channel(batch_df, batch_id):
         user_id = row["user_id"]
         order_id = row["order_id"]
         event_name = row["event_name"]
-        channel = row["channel"]
+        channel = row["channel"] if row["channel"] else "organic"
         if event_name == 'visit':
-            if user_id not in user_tracker:
-                if channel:
-                    user_tracker[user_id] = channel 
-                else:
-                    user_tracker[user_id] = "organic"
-                print(user_tracker)
+                if user_id not in user_tracker:
+                    user_tracker[user_id] = channel
+            # if user_id not in user_tracker:
+            #     if channel:
+            #         user_tracker[user_id] = channel 
+            #     else:
+            #         user_tracker[user_id] = "organic"
+            #     print(user_tracker)
         elif event_name == 'order_confirmed':
             channel = user_tracker.get(user_id, 'organic')
         store_attribution(user_id, order_id, channel)
