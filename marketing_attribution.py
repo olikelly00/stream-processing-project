@@ -58,7 +58,7 @@ def store_attribution(user_id, order_id, channel):
     Stores the marketing attribution data into the PostgreSQL database.
     """
     conn = psycopg2.connect(
-        dbname="green-analytics-db",
+        dbname="green_analytics",
         user="postgres",
         password="i_am_a_password",
         host="green-analytics-db.cfmnnswnfhpn.eu-west-2.rds.amazonaws.com",
