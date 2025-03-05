@@ -48,13 +48,13 @@ data_frame = df.withColumn(
     col("parsed_value.channel").alias("channel")
 )
 
-query = df.writeStream \
-    .format("console") \
-    .options(**kafka_options) \
-    .option("checkpointLocation", "/tmp/kafka-checkpoints") \
-    .start()
+# query = df.writeStream \
+#     .format("console") \
+#     .options(**kafka_options) \
+#     .option("checkpointLocation", "/tmp/kafka-checkpoints") \
+#     .start()
 
-query.awaitTermination()
+# query.awaitTermination()
 
 
 # if not, continue
