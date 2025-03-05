@@ -53,6 +53,30 @@ data_frame = df.withColumn(
 
 user_tracker = {}
 
+def store_attribution(user_id, order_id, channel):
+    """
+    Stores the marketing attribution data into the PostgreSQL database.
+    """
+    conn = psycopg2.connect(
+        dbname="green-analytics-db",
+        user="postgres",
+        password="i_am_a_password",
+        host="green-analytics-db.cfmnnswnfhpn.eu-west-2.rds.amazonaws.com",
+        port="5432"
+    )
+
+    cursor = conn.cursor()
+
+    insert_query = """
+    INSERT INTO purchase_marketing_attributions (user_id, order_id, marketing_channel)
+    VALUES (%s, %s, %s)
+    """
+    cursor.execute(insert_query, (user_id, order_id, channel))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
 def track_marketing_channel(batch_df, batch_id):
     for row in batch_df.collect():
         user_id = row["user_id"]
@@ -78,28 +102,6 @@ query = data_frame.writeStream \
 query.awaitTermination()
 
 
-def store_attribution(user_id, order_id, channel):
-    """
-    Stores the marketing attribution data into the PostgreSQL database.
-    """
-    conn = psycopg2.connect(
-        dbname="green-analytics-db",
-        user="postgres",
-        password="i_am_a_password",
-        host="green-analytics-db.cfmnnswnfhpn.eu-west-2.rds.amazonaws.com",
-        port="5432"
-    )
-
-    cursor = conn.cursor()
-
-    insert_query = """
-    INSERT INTO purchase_marketing_attributions (user_id, order_id, marketing_channel)
-    VALUES (%s, %s, %s)
-    """
-    cursor.execute(insert_query, (user_id, order_id, channel))
-    conn.commit()
-    cursor.close()
-    conn.close()
 
 
 # conn = psycopg2.connect( dbname="analytics_db", user="admin", password="password123", host="your-database-host", port="5432" ) 
