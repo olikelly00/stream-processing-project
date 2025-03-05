@@ -60,7 +60,7 @@ def store_attribution(user_id, order_id, channel):
     conn = psycopg2.connect(
         dbname="green_analytics",
         user="postgres",
-        # password="i_am_a_password",
+        password="i_am_a_password",
         host="green-analytics-db.cfmnnswnfhpn.eu-west-2.rds.amazonaws.com",
         port="5432"
     )
