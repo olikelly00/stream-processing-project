@@ -71,7 +71,7 @@ def store_attribution(user_id, order_id, channel):
 
     insert_query = """
     INSERT INTO purchase_marketing_attributions (user_id, order_id, marketing_channel)
-    VALUES (%s, %s, %s)
+    VALUES (%s, %s, %s);
     """
     cursor.execute(create_table)
     cursor.execute(insert_query, (user_id, order_id, channel))
