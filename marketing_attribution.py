@@ -102,24 +102,24 @@ track_marketing_channel()
 
 
 
-        if event_name == "order_confirmed":
-            target_user = row["user_id"]
-            # if so, search event stream fo first instance of user_id
-            first_instance_user_event = batch_df[]
+        # if event_name == "order_confirmed":
+        #     target_user = row["user_id"]
+        #     # if so, search event stream fo first instance of user_id
+        #     first_instance_user_event = batch_df[]
 
-            if user_id not in add_to_cart_tracker:
-                add_to_cart_tracker[user_id] = {}
+        #     if user_id not in add_to_cart_tracker:
+        #         add_to_cart_tracker[user_id] = {}
 
-            # Store item with timestamp
-            add_to_cart_tracker[user_id][item_url] = current_time
-            print(add_to_cart_tracker)
-            # Remove old items (older than 5 seconds)
-            add_to_cart_tracker[user_id] = {
-                item: timestamp for item, timestamp in add_to_cart_tracker[user_id].items()
-                if timestamp >= current_time - 5
-            }
+        #     # Store item with timestamp
+        #     add_to_cart_tracker[user_id][item_url] = current_time
+        #     print(add_to_cart_tracker)
+        #     # Remove old items (older than 5 seconds)
+        #     add_to_cart_tracker[user_id] = {
+        #         item: timestamp for item, timestamp in add_to_cart_tracker[user_id].items()
+        #         if timestamp >= current_time - 5
+        #     }
 
-            # Check if user added 5 different items in the last 5 seconds
-            if len(add_to_cart_tracker[user_id]) >= 2:
-                send_fraud_alert(user_id)
+        #     # Check if user added 5 different items in the last 5 seconds
+        #     if len(add_to_cart_tracker[user_id]) >= 2:
+        #         send_fraud_alert(user_id)
 
