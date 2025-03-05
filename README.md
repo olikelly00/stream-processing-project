@@ -38,6 +38,7 @@ Here is a diagram illustrating how the components of this project interact:
 ### `consumer.py`
 
 Retrieves data from a Kafka cluster hosted on AWS MSK, converts it from bytes to a PySpark DataFrame for transformation, redacts email addresses for privacy, and streams the cleaned data to a new Kafka topic (`processed_events`).
+Additionally, this script stores transformed event data in a PostgreSQL database using *psycopg2*, ensuring persistent storage for further analysis.
 
 #### Technical Challenge
 
@@ -47,7 +48,7 @@ Establishing a secure connection to AWS MSK was a new challenge. MSK uses IAM au
 
 ### `database_consumer.py`
 
-Retrieves event data from Kafka, converts it to a PySpark DataFrame, and loads it into an analytical database hosted on AWS RDS.
+Retrieves event data from Kafka, converts it to a PySpark DataFrame, and loads it into an analytical database hosted on AWS RDS. The script applies structured transformations using predefined PySpark schemas, ensuring that event data remains in a consistent format before storage.
 
 #### Technical Challenge
 
