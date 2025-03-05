@@ -65,6 +65,8 @@ data_frame = df.withColumn(
     col("parsed_value.order_email").alias("order_email"),
     col("parsed_value.channel").alias("channel")
 )
+data_frame = data_frame.withColumn("order_email", lit("[Redacted]"))
+
 
 conn = psycopg2.connect(
         dbname="postgres",
@@ -74,23 +76,17 @@ conn = psycopg2.connect(
         port="5432"
     )
 
-
-
-
 cursor = conn.cursor()
 
 select_user_data = """
 SELECT id, birthdate, country_code, web_user_agent FROM users;
 """
+cursor.execute(select_user_data)
+rows = cursor.fetchall()
 
+columns = ["id", "birthdate", "country_code", "web_user_agent"]
+user_df = spark.createDataFrame(rows, columns)
 
-# cursor.execute(select_user_data)
-
-user_df = spark.sql(cursor.execute("SELECT id, birthdate, country_code, web_user_agent FROM users;"))
-
-
-
-data_frame = data_frame.withColumn("order_email", lit("[Redacted]"))
 
 master_df = user_df.join(data_frame, user_df.user_id == data_frame.user_id).select('user_df.*')
 
