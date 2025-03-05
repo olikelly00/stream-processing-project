@@ -74,7 +74,8 @@ def track_marketing_channel(batch_df, batch_id):
         channel = row["channel"]
         if event_name == 'visit':
             if user_id not in user_tracker:
-                user_tracker[user_id] = channel if channel else 'organic'
+                user_tracker[user_id] = channel if channel else channel = 'organic'
+                print(user_tracker)
         elif event_name == 'order_confirmed':
             channel = user_tracker.get(user_id)
         print("New user tracked!", row)
