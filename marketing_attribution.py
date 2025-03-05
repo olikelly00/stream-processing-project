@@ -54,6 +54,7 @@ query = df.writeStream \
     .option("checkpointLocation", "/tmp/kafka-checkpoints") \
     .start()
 
+query.awaitTermination()
 
 
 # check if event has event_name of 'purchase'
