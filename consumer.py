@@ -89,7 +89,7 @@ SELECT user_id, birthdate, country_code, web_user_agent FROM users;
 
 # cursor.execute(select_user_data)
 
-user_df = SQLContext.sql("SELECT user_id, birthdate, country_code, web_user_agent FROM users;")
+user_df = spark.sql("SELECT user_id, birthdate, country_code, web_user_agent FROM users;")
 
 
 
