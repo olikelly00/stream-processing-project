@@ -46,7 +46,7 @@ data_frame = df.withColumn(
     from_json(col('decoded_value'), schema)
 ).select(
     col("parsed_value.user_id").alias("user_id"),
-    col("parsed_value.order_id").alias("order_id")
+    col("parsed_value.order_id").alias("order_id"),
     col("parsed_value.event_name").alias("event_name"),
     col("parsed_value.channel").alias("channel")
 )
