@@ -14,7 +14,6 @@ def oauth_cb(oauth_config):
     return auth_token, expiry_ms/1000
 
 
-
 spark = SparkSession.builder \
     .appName("FraudDetection") \
     .config('spark.jars.packages', 'org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,software.amazon.msk:aws-msk-iam-auth:2.2.0') \
@@ -151,7 +150,6 @@ data_frame = df.withColumn(
     col("parsed_value.item_url").alias("item_url")
 )
 
-
 add_to_cart_tracker = {}
 
 # Kafka producer setup for publishing fraud alerts
@@ -170,6 +168,29 @@ def send_fraud_alert(user_id):
     producer.produce("fraud-detection", value=message.encode("utf-8"))
     producer.flush()
     print(f"🚨 Fraud Alert Sent for user {user_id} 🚨")
+
+
+
+def reset_tracker():
+    """Clears old items every 5 seconds."""
+    global add_to_cart_tracker
+    current_time = time.time()
+
+    for user_id in list(add_to_cart_tracker.keys()):
+        add_to_cart_tracker[user_id] = {
+            item: timestamp for item, timestamp in add_to_cart_tracker[user_id].items()
+            if timestamp >= current_time - 5  # Keep only the last 5 seconds of data
+        }
+
+        # If a user's list is empty, remove them entirely
+        if not add_to_cart_tracker[user_id]:
+            del add_to_cart_tracker[user_id]
+
+    print("🔄 Tracker Reset:", add_to_cart_tracker)  # Debugging print
+    threading.Timer(5, reset_tracker).start()
+
+# Start the reset loop
+reset_tracker()
 
 def detect_fraud(batch_df, batch_id):
     """Detects fraudulent 'add_to_cart' activity in each batch."""
