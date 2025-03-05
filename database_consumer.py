@@ -64,20 +64,18 @@ query = data_frame.writeStream \
     .outputMode("append") \
     .start()
 
-def write_to_postgres(batch_df, batch_id):
-    batch_df.write \
-        .format("jdbc") \
-        .option("url", "jdbc:postgresql://green-analytics-db.cfmnnswnfhpn.eu-west-2.rds.amazonaws.com:5432/green_analytics") \
-        .option("driver", "org.postgresql.Driver") \
-        .option("dbtable", "events") \
-        .option("user", "postgres") \
-        .option("password", "i_am_a_password") \
-        .mode("append") \
-        .save()
+batch_df = spark.read.parquet("/tmp/stream_output/")
 
-query = data_frame.writeStream \
-    .foreachBatch(write_to_postgres) \
-    .outputMode("append") \
-    .start()
 
-query.awaitTermination()
+batch_df.write \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://green-analytics-db.cfmnnswnfhpn.eu-west-2.rds.amazonaws.com:5432/green_analytics") \
+    .option("driver", "org.postgresql.Driver") \
+    .option("dbtable", "events") \
+    .option("user", "postgres") \
+    .option("password", "i_am_a_password") \
+    .mode("append") \
+    .save()
+
+
+
