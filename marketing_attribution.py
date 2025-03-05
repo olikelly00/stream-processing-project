@@ -80,10 +80,12 @@ def track_marketing_channel(batch_df):
     print("CHANNEL:", channel)
     return channel
 
-            
-track_marketing_channel(data_frame)
-        
+       
+query = data_frame.writeStream \
+    .foreachBatch(track_marketing_channel) \
+    .start()
 
+query.awaitTermination()
 # for every event
 # if event_name = 'visit'
 # if user_id not in user_tracker
