@@ -11,6 +11,15 @@ import os
 
 load_dotenv()
 
+print(os.getenv("KAFKA_BOOTSTRAP_SERVER"))
+print(os.getenv("KAFKA_SASL_JAAS_CONFIG"))
+
+print(os.getenv("ANALYTICAL_DB_NAME"))
+print(os.getenv("ANALYTICAL_DB_USER"))
+print(os.getenv("ANALYTICAL_DB_PASSWORD"))
+print(os.getenv("ANALYTICAL_DB_HOST"))
+print(os.getenv("ANALYTICAL_DB_PORT"))
+
 def oauth_cb(oauth_config):
     auth_token, expiry_ms = MSKAuthTokenProvider.generate_auth_token("eu-west-2")
     # Note that this library expects oauth_cb to return expiry time in seconds since epoch, while the token generator returns expiry in ms
