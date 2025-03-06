@@ -29,7 +29,7 @@ Here is a diagram illustrating how the components of this project interact:
 
 ### Cloud Services
 
-- **AWS EC2** – Hosting data pipelines
+- **AWS EC2** – Hosting data pipelines, Kafka UI and Apache Spark
 - **AWS MSK (Managed Streaming for Apache Kafka)** – Hosting a Kafka cluster
 - **AWS RDS (Relational Database Service)** – Storing processed event data
 
