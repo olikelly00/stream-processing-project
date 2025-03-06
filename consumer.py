@@ -82,11 +82,11 @@ data_frame = data_frame.withColumn("order_email", lit("[Redacted]"))
 
 
 conn = psycopg2.connect(
-        dbname=os.getenv("ANALYTICAL_DB_NAME"),
-        user=os.getenv("ANALYTICAL_DB_USER"),
-        password=os.getenv("ANALYTICAL_DB_PASSWORD"),
-        host=os.getenv("ANALYTICAL_DB_HOST"),
-        port=os.getenv("ANALYTICAL_DB_PORT"),
+        dbname=os.getenv("USER_DB_NAME"),
+        user=os.getenv("USER_DB_USER"),
+        password=os.getenv("USER_DB_PASSWORD"),
+        host=os.getenv("USER_DB_HOST"),
+        port=os.getenv("USER_DB_PORT"),
     )
 
 cursor = conn.cursor()
