@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/538ccf12-774b-4ce5-afc5-d0495deb397c)![image](https://github.com/user-attachments/assets/5ec089e6-82c1-4062-82c2-459addf777ba)# Data Engineering Workflows for E-Commerce
+# Data Engineering Workflows for E-Commerce
 
 ## Contributors
 
