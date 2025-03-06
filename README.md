@@ -1,4 +1,4 @@
-# Data Engineering Workflows for E-Commerce
+![image](https://github.com/user-attachments/assets/538ccf12-774b-4ce5-afc5-d0495deb397c)![image](https://github.com/user-attachments/assets/5ec089e6-82c1-4062-82c2-459addf777ba)# Data Engineering Workflows for E-Commerce
 
 ## Contributors
 
@@ -13,7 +13,7 @@ This project implements data engineering workflows to support a fictional e-comm
 
 Here is a diagram illustrating how the components of this project interact:
 
-*(Add architecture diagram here)*
+![image](https://github.com/user-attachments/assets/fdfc8c01-9be8-405e-876e-6b22de1c0077)
 
 ## Stack
 
