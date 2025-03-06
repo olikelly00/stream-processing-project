@@ -1,8 +1,7 @@
 from aws_msk_iam_sasl_signer import MSKAuthTokenProvider
 from pyspark.sql import SparkSession
-from pyspark.sql.types import StructType, StructField, StringType, BooleanType
-from pyspark.sql.functions import col, from_json, expr, lit
-from pyspark.sql.functions import udf
+from pyspark.sql.types import StructType, StructField, StringType
+from pyspark.sql.functions import col, from_json
 import json
 import time
 import threading

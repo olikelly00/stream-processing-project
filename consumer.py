@@ -1,10 +1,7 @@
-from confluent_kafka import Consumer, KafkaException
 from aws_msk_iam_sasl_signer import MSKAuthTokenProvider
-from pyspark.sql import SparkSession, SQLContext
+from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType
-from pyspark.sql.functions import col, from_json, expr, lit
-import socket
-import json
+from pyspark.sql.functions import col, from_json, lit
 import psycopg2
 from dotenv import load_dotenv
 import os

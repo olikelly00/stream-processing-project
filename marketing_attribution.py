@@ -1,12 +1,11 @@
 from aws_msk_iam_sasl_signer import MSKAuthTokenProvider
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, BooleanType
-from pyspark.sql.functions import col, from_json, expr, lit
+from pyspark.sql.functions import col, from_json
 from pyspark.sql.functions import udf
 import psycopg2
 import os
 from dotenv import load_dotenv
-from confluent_kafka import Producer
 
 load_dotenv()
 
