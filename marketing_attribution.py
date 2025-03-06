@@ -4,11 +4,11 @@ from pyspark.sql.types import StructType, StructField, StringType, BooleanType
 from pyspark.sql.functions import col, from_json, expr, lit
 from pyspark.sql.functions import udf
 import psycopg2
-import json
-import time
-import threading
-import socket
+import os
+from dotenv import load_dotenv
 from confluent_kafka import Producer
+
+load_dotenv()
 
 def oauth_cb(oauth_config):
     auth_token, expiry_ms = MSKAuthTokenProvider.generate_auth_token("eu-west-2")
@@ -20,10 +20,10 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 kafka_options = {
-    "kafka.bootstrap.servers": "b-2-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198",
+    "kafka.bootstrap.servers": os.getenv("KAFKA_BOOTSTRAP_SERVER"),
     "kafka.sasl.mechanism": "AWS_MSK_IAM",
     "kafka.security.protocol": "SASL_SSL",
-    "kafka.sasl.jaas.config": """software.amazon.msk.auth.iam.IAMLoginModule required awsProfileName="";""",
+    "kafka.sasl.jaas.config": os.getenv("KAFKA_SASL_JAAS_CONFIG"),
     "kafka.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
     "startingOffsets": "latest",
     "subscribe": "events"
@@ -58,15 +58,14 @@ def store_attribution(user_id, order_id, channel):
     Stores the marketing attribution data into the PostgreSQL database.
     """
     conn = psycopg2.connect(
-        dbname="green_analytics",
-        user="postgres",
-        password="i_am_a_password",
-        host="green-analytics-db.cfmnnswnfhpn.eu-west-2.rds.amazonaws.com",
-        port="5432"
+        dbname=os.getenv("ANALYTICAL_DB_NAME"),
+        user=os.getenv("ANALYTICAL_DB_USER"),
+        password=os.getenv("ANALYTICAL_DB_PASSWORD"),
+        host=os.getenv("ANALYTICAL_DB_HOST"),
+        port=os.getenv("ANALYTICAL_DB_PORT"),
     )
 
     cursor = conn.cursor()
-
 
     create_table = """
     CREATE TABLE IF NOT EXISTS purchase_marketing_attributions (
@@ -96,12 +95,6 @@ def track_marketing_channel(batch_df, batch_id):
         if event_name == 'visit':
                 if user_id not in user_tracker:
                     user_tracker[user_id] = channel
-            # if user_id not in user_tracker:
-            #     if channel:
-            #         user_tracker[user_id] = channel 
-            #     else:
-            #         user_tracker[user_id] = "organic"
-            #     print(user_tracker)
         elif event_name == 'order_confirmed':
             channel = user_tracker.get(user_id, 'organic')
         store_attribution(user_id, order_id, channel)
@@ -112,11 +105,3 @@ query = data_frame.writeStream \
     .start()
 
 query.awaitTermination()
-
-
-
-
-# conn = psycopg2.connect( dbname="analytics_db", user="admin", password="password123", host="your-database-host", port="5432" ) 
-
-# cursor = conn.cursor()
-

@@ -7,7 +7,11 @@ import json
 import time
 import threading
 import socket
+import os
+from dotenv import load_dotenv
 from confluent_kafka import Producer
+
+load_dotenv()
 
 def oauth_cb(oauth_config):
     auth_token, expiry_ms = MSKAuthTokenProvider.generate_auth_token("eu-west-2")
@@ -21,10 +25,10 @@ spark = SparkSession.builder \
 
 
 kafka_options = {
-    "kafka.bootstrap.servers": "b-2-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198",
+    "kafka.bootstrap.servers": os.getenv("KAFKA_BOOTSTRAP_SERVER"),
     "kafka.sasl.mechanism": "AWS_MSK_IAM",
     "kafka.security.protocol": "SASL_SSL",
-    "kafka.sasl.jaas.config": """software.amazon.msk.auth.iam.IAMLoginModule required awsProfileName="";""",
+    "kafka.sasl.jaas.config": os.getenv("KAFKA_SASL_JAAS_CONFIG"),
     "kafka.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
     "startingOffsets": "latest",
     "subscribe": "events"
@@ -32,107 +36,6 @@ kafka_options = {
 
 df = spark.readStream.format("kafka").options(**kafka_options).load()
 df = df.withColumn('decoded_value', col('value').cast('string'))
-
-
-# schema = StructType([
-#     StructField("user_id", StringType(), True),
-#     StructField("event_name" , StringType(), True),
-#     StructField("page" , StringType(), True),
-#     StructField("item_url" , StringType(), True),
-#     StructField("order_email" , StringType(), True),
-# ])
-
-
-# data_frame = df.withColumn(
-#     'parsed_value',
-#     from_json(col('decoded_value'), schema)
-# ).select(
-#     col("parsed_value.user_id").alias("user_id"),
-#     col("parsed_value.event_name").alias("event_name"),
-#     col("parsed_value.page").alias("page"),
-#     col("parsed_value.item_url").alias("item_url"),
-#     col("parsed_value.order_email").alias("order_email")
-# )
-
-# df = data_frame.selectExpr("to_json(struct(*)) AS value")
-
-
-# # query = df.writeStream \
-# #     .format("console") \
-# #     .options(**kafka_options) \
-# #     .option("checkpointLocation", "/tmp/kafka-checkpoints") \
-# #     .start()
-
-
-# # query.awaitTermination()
-
-
-# add_to_cart_tracker = {}
-
-# async def reset_dict(dict):
-#     await asyncio.sleep(5)
-#     dict.clear()
-
-# async def detect_fraud(value):
-#     print(value)
-
-#     #add_to_cart_tracker["user_id"] = 1
-#     #print(add_to_cart_tracker)
-#     #asyncio.create_task(reset_dict(add_to_cart_tracker))
-#     #await reset_dict(add_to_cart_tracker)
-#     #print(add_to_cart_tracker)
-#     #await asyncio.sleep(6)
-#     #print(add_to_cart_tracker)
-
-#     value_dict = json.loads(str(value))
-#     print(value_dict)
-#     user_id = value_dict.get('user_id')
-#     event_name = value_dict.get('event_name')
-#     print("Hello fraudster!!!")
-
-#     asyncio.create_task(reset_dict(add_to_cart_tracker))
-#     if event_name == "add_to_cart":
-#         print("Add to cart event detected")
-#         current_time = time.time()
-#         if user_id not in add_to_cart_tracker:
-#             add_to_cart_tracker[user_id] = [current_time]
-#             print(add_to_cart_tracker)
-#         else:
-#             add_to_cart_tracker[user_id].append(current_time)
-#             print("I got here ----- in the else")
-#                 #[timestamp for timestamp in add_to_cart_tracker[event["user_id"]] if timestamp >= (current_time - 5)]
-
-#         if len(add_to_cart_tracker[user_id]) >= 5:
-#             print("THIS IS A FRAUD")
-#             return True
-#             # DO A FRAUD MESSAGE
-            
-#         return False
-    
-
-
-# detect_fraud_spark_udf = udf(detect_fraud, BooleanType())
-
-# df_with_fraud = df.withColumn("is_fraud", detect_fraud_spark_udf(col("value")))
-
-# query = df_with_fraud.writeStream \
-#     .outputMode("append") \
-#     .format("console") \
-#     .start()
-
-# query.awaitTermination()
-
-# try:
-#     print(df['value'])
-#     asyncio.run(detect_fraud(df['value']))
-
-# except Exception as e: 
-#     print(e)
-#detect_fraud(df['value'])
-# cleanup_thread = threading.Thread(target=reset_dict, args=(add_to_cart_tracker,), daemon=True)
-# cleanup_thread.start()
-
-
 
 schema = StructType([
     StructField("user_id", StringType(), True),
@@ -154,7 +57,7 @@ add_to_cart_tracker = {}
 
 # Kafka producer setup for publishing fraud alerts
 producer_config = {
-    'bootstrap.servers': "b-2-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198",
+    'bootstrap.servers': os.getenv("KAFKA_BOOTSTRAP_SERVER"),
     'client.id': socket.gethostname(),
     'security.protocol': 'SASL_SSL',
     'sasl.mechanisms': 'OAUTHBEARER',

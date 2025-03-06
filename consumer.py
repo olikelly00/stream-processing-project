@@ -6,6 +6,10 @@ from pyspark.sql.functions import col, from_json, expr, lit
 import socket
 import json
 import psycopg2
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 def oauth_cb(oauth_config):
     auth_token, expiry_ms = MSKAuthTokenProvider.generate_auth_token("eu-west-2")
@@ -21,10 +25,10 @@ spark = SparkSession.builder \
 
 
 kafka_options = {
-    "kafka.bootstrap.servers": "b-2-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198",
+    "kafka.bootstrap.servers": os.getenv("KAFKA_BOOTSTRAP_SERVER"),
     "kafka.sasl.mechanism": "AWS_MSK_IAM",
     "kafka.security.protocol": "SASL_SSL",
-    "kafka.sasl.jaas.config": """software.amazon.msk.auth.iam.IAMLoginModule required awsProfileName="";""",
+    "kafka.sasl.jaas.config": os.getenv("KAFKA_SASL_JAAS_CONFIG"),
     "kafka.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
     "startingOffsets": "latest",
     "subscribe": "events"
@@ -32,10 +36,10 @@ kafka_options = {
 
 
 kafka_options_processed_events = {
-    "kafka.bootstrap.servers": "b-1-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198",
+    "kafka.bootstrap.servers": os.getenv("KAFKA_BOOTSTRAP_SERVER"),
     "kafka.sasl.mechanism": "AWS_MSK_IAM",
     "kafka.security.protocol": "SASL_SSL",
-    "kafka.sasl.jaas.config": """software.amazon.msk.auth.iam.IAMLoginModule required awsProfileName="";""",
+    "kafka.sasl.jaas.config": os.getenv("KAFKA_SASL_JAAS_CONFIG"),
     "kafka.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
     "startingOffsets": "latest"
 }
@@ -69,11 +73,11 @@ data_frame = data_frame.withColumn("order_email", lit("[Redacted]"))
 
 
 conn = psycopg2.connect(
-        dbname="postgres",
-        user="postgres",
-        password="=abO1aUrF!hHX#:5",
-        host="sp-application-users-database.cfmnnswnfhpn.eu-west-2.rds.amazonaws.com",
-        port="5432"
+        dbname=os.getenv("ANALYTICAL_DB_NAME"),
+        user=os.getenv("ANALYTICAL_DB_USER"),
+        password=os.getenv("ANALYTICAL_DB_PASSWORD"),
+        host=os.getenv("ANALYTICAL_DB_HOST"),
+        port=os.getenv("ANALYTICAL_DB_PORT"),
     )
 
 cursor = conn.cursor()
@@ -99,7 +103,6 @@ query = df.writeStream \
     .option("topic", "processed-events") \
     .option("checkpointLocation", "/tmp/kafka-checkpoints") \
     .start()
-
 
 
 query.awaitTermination()

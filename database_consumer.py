@@ -1,6 +1,10 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType
 from pyspark.sql.functions import col, from_json
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Initialize Spark Session
 spark = SparkSession.builder \
@@ -10,10 +14,10 @@ spark = SparkSession.builder \
 
 # Kafka connection settings
 kafka_options = {
-    "kafka.bootstrap.servers": "b-2-public.greencluster.jdc7ic.c3.kafka.eu-west-2.amazonaws.com:9198",
+    "kafka.bootstrap.servers": os.getenv("KAFKA_BOOTSTRAP_SERVER"),
     "kafka.sasl.mechanism": "AWS_MSK_IAM",
     "kafka.security.protocol": "SASL_SSL",
-    "kafka.sasl.jaas.config": """software.amazon.msk.auth.iam.IAMLoginModule required awsProfileName="";""",
+    "kafka.sasl.jaas.config": os.getenv("KAFKA_SASL_JAAS_CONFIG"),
     "kafka.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
     "startingOffsets": "latest",
     "subscribe": "events"
@@ -49,11 +53,11 @@ data_frame = df.withColumn(
 def write_to_postgres(batch_df, batch_id):
     batch_df.write \
         .format("jdbc") \
-        .option("url", "jdbc:postgresql://green-analytics-db.cfmnnswnfhpn.eu-west-2.rds.amazonaws.com:5432/green_analytics") \
+        .option("url", os.getenv("ANALYTICAL_DB_URL")) \
         .option("driver", "org.postgresql.Driver") \
         .option("dbtable", "events") \
-        .option("user", "postgres") \
-        .option("password", "i_am_a_password") \
+        .option("user", os.getenv("ANALYTICAL_DB_USER")) \
+        .option("password", os.getenv("ANALYTICAL_DB_PASSWORD")) \
         .mode("append") \
         .save()
 
